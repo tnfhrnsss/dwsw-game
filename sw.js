@@ -1,9 +1,10 @@
 const CACHE_NAME = 'hangul-game-v1';
+const BASE_PATH = '/dwsw-game';
 
 // 절대적으로 필요한 핵심 파일만 초기 캐시
 const urlsToCache = [
-  '/',
-  '/manifest.json',
+  BASE_PATH + '/',
+  BASE_PATH + '/manifest.json',
 ];
 
 // 설치 이벤트: 캐시에 파일 저장
@@ -46,7 +47,7 @@ self.addEventListener('fetch', (event) => {
           return response;
         }).catch(() => {
           // 오프라인이고 캐시에도 없으면 기본 페이지 반환
-          return caches.match('/index.html');
+          return caches.match(BASE_PATH + '/index.html');
         });
       })
   );
