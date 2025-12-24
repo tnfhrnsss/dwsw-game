@@ -1,6 +1,6 @@
 {
   "name": "조카들 학습 게임",
-  "short_name": "학습게임",
+  "short_name": "도원-승우 공부",
   "description": "한글 배우기와 공룡 메모리 게임",
   "start_url": "/dwsw-game/",
   "display": "standalone",
