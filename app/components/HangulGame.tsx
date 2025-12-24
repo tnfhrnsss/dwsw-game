@@ -96,7 +96,6 @@ const wordDatabase = [
   { word: '토마토', emoji: '🍅', category: '과일' },
   { word: '매실', emoji: '🍑', category: '과일' },
   { word: '석류', emoji: '🍎', category: '과일' },
-  { word: '용과', emoji: '🐉', category: '과일' },
 
   // 채소 (20개)
   { word: '당근', emoji: '🥕', category: '채소' },
