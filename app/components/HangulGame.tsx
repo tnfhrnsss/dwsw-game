@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { getAssetPath } from '../lib/basePath';
 import '../hangul-game.css';
 
 // 200개 단어 데이터베이스
@@ -294,8 +295,8 @@ export default function HangulGame({ onBack, speed }: HangulGameProps) {
 
   // 플레이어 데이터
   const players: Player[] = [
-    { id: 1, name: '도원', image: '/players/dowon.jpeg', bgColor: 'bg-pink-400' },
-    { id: 2, name: '승우', image: '/players/seungwoo.jpeg', bgColor: 'bg-blue-400' }
+    { id: 1, name: '도원', image: getAssetPath('/players/dowon.jpeg'), bgColor: 'bg-pink-400' },
+    { id: 2, name: '승우', image: getAssetPath('/players/seungwoo.jpeg'), bgColor: 'bg-blue-400' }
   ];
 
   // 속도 설정
@@ -408,13 +409,13 @@ export default function HangulGame({ onBack, speed }: HangulGameProps) {
   // BGM 및 효과음 재생 관리
   useEffect(() => {
     if (typeof window !== 'undefined' && !bgmRef.current) {
-      bgmRef.current = new Audio('/sounds/bgm.mp3');
+      bgmRef.current = new Audio(getAssetPath('/sounds/bgm.mp3'));
       bgmRef.current.loop = true;
       bgmRef.current.volume = 0.3;
     }
 
     if (typeof window !== 'undefined' && !cheerSoundRef.current) {
-      cheerSoundRef.current = new Audio('/sounds/cheer.mp3');
+      cheerSoundRef.current = new Audio(getAssetPath('/sounds/cheer.mp3'));
       cheerSoundRef.current.volume = 0.5;
     }
 

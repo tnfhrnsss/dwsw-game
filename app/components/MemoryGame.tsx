@@ -2,19 +2,20 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { getAssetPath } from '../lib/basePath';
 
 // 공룡 카드 데이터베이스
 // 이미지 파일을 public/dinosaurs/ 폴더에 넣어주세요
 // 예: brachiosaurus.png, tyrannosaurus.png 등
 const dinosaurs = [
-  { id: 1, image: '/dinosaurs/brachiosaurus.png', name: '브라키오사우루스' },
-  { id: 2, image: '/dinosaurs/tyrannosaurus.png', name: '티라노사우루스' },
-  { id: 3, image: '/dinosaurs/triceratops.png', name: '트리케라톱스' },
-  { id: 4, image: '/dinosaurs/velociraptor.png', name: '벨로시랩터' },
-  { id: 5, image: '/dinosaurs/spinosaurus.png', name: '스피노사우루스' },
-  { id: 6, image: '/dinosaurs/ankylosaurus.png', name: '안킬로사우루스' },
-  { id: 7, image: '/dinosaurs/pteranodon.png', name: '프테라노돈' },
-  { id: 8, image: '/dinosaurs/stegosaurus.png', name: '스테고사우루스' },
+  { id: 1, image: getAssetPath('/dinosaurs/brachiosaurus.png'), name: '브라키오사우루스' },
+  { id: 2, image: getAssetPath('/dinosaurs/tyrannosaurus.png'), name: '티라노사우루스' },
+  { id: 3, image: getAssetPath('/dinosaurs/triceratops.png'), name: '트리케라톱스' },
+  { id: 4, image: getAssetPath('/dinosaurs/velociraptor.png'), name: '벨로시랩터' },
+  { id: 5, image: getAssetPath('/dinosaurs/spinosaurus.png'), name: '스피노사우루스' },
+  { id: 6, image: getAssetPath('/dinosaurs/ankylosaurus.png'), name: '안킬로사우루스' },
+  { id: 7, image: getAssetPath('/dinosaurs/pteranodon.png'), name: '프테라노돈' },
+  { id: 8, image: getAssetPath('/dinosaurs/stegosaurus.png'), name: '스테고사우루스' },
 ];
 
 type GameState = 'start' | 'selectPlayer' | 'preview' | 'playing' | 'checking' | 'levelComplete' | 'gameComplete';
@@ -53,8 +54,8 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
   const cheerSoundRef = useRef<HTMLAudioElement | null>(null);
 
   const players: Player[] = [
-    { id: 1, name: '도원', image: '/players/dowon.jpeg', bgColor: 'bg-pink-400' },
-    { id: 2, name: '승우', image: '/players/seungwoo.jpeg', bgColor: 'bg-blue-400' }
+    { id: 1, name: '도원', image: getAssetPath('/players/dowon.jpeg'), bgColor: 'bg-pink-400' },
+    { id: 2, name: '승우', image: getAssetPath('/players/seungwoo.jpeg'), bgColor: 'bg-blue-400' }
   ];
 
   // 카드 생성 및 섞기 - 4장(2쌍) 또는 6장(3쌍) 랜덤
@@ -202,14 +203,14 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
   useEffect(() => {
     // BGM 객체 생성
     if (typeof window !== 'undefined' && !bgmRef.current) {
-      bgmRef.current = new Audio('/sounds/bgm.mp3');
+      bgmRef.current = new Audio(getAssetPath('/sounds/bgm.mp3'));
       bgmRef.current.loop = true;
       bgmRef.current.volume = 0.3; // 볼륨 30%
     }
 
     // 환호 효과음 객체 생성
     if (typeof window !== 'undefined' && !cheerSoundRef.current) {
-      cheerSoundRef.current = new Audio('/sounds/cheer.mp3');
+      cheerSoundRef.current = new Audio(getAssetPath('/sounds/cheer.mp3'));
       cheerSoundRef.current.volume = 0.5; // 볼륨 50%
     }
 

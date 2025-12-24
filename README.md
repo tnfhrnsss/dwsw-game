@@ -1,36 +1,286 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 조카들 학습 게임 모음
 
-## Getting Started
+## 프로젝트 개요
+6~7살 어린이를 위한 학습 게임 모음입니다. 두 가지 게임이 포함되어 있습니다:
 
-First, run the development server:
+1. **한글 배우기** - 그림을 보고 떨어지는 한글 글자 중 정답을 터치하여 선택하는 게임
+2. **공룡 메모리 게임** - 공룡 카드를 뒤집어 같은 공룡 짝을 찾는 기억력 게임
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 타겟 디바이스
+- 갤럭시 탭 태블릿
+- 터치 기반 인터페이스
+
+## 주요 기능
+
+### 게임 선택
+- **초기 화면**: 한글 배우기와 공룡 메모리 게임 중 선택
+- **플레이어 선택**: 각 게임 시작 전 플레이어(도원/승우) 선택
+- **뒤로가기**: 언제든지 게임 선택 화면으로 돌아갈 수 있음
+
+### 1. 한글 배우기 게임
+
+#### 게임 메커니즘
+- **제시어 표시**: 동물, 곤충, 생활용품 등의 그림(이모지)과 함께 단어 제시
+- **떨어지는 글자**: 정답 글자와 오답 글자들이 위에서 아래로 떨어짐
+- **터치 선택**: 맞는 글자를 순서대로 터치하여 선택
+- **실패 조건**: 정답 글자가 지면에 닿으면 실패
+- **재시도**: 틀린 경우 재시도 아이콘으로 다시 시도 가능
+
+#### 단어 데이터베이스
+- **총 단어 수**: 약 200개
+- **카테고리**:
+  - 동물 (강아지, 고양이, 기린, 코끼리, 토끼 등)
+  - 곤충 (나비, 개미, 벌, 잠자리 등)
+  - 생활용품/집기 (의자, 책상, 냉장고, 침대 등)
+  - 음식 (사과, 바나나, 김치 등)
+  - 기타 일상 사물
+- **랜덤 출제**: 매번 랜덤하게 단어 선택
+
+#### 난이도 조절
+- **속도 조절 옵션**: 
+  - 느림 (초보자용)
+  - 보통 (기본값)
+  - 빠름 (숙련자용)
+- **난이도**: 2~4글자 단어 위주 (6~7살 수준)
+- **연속 정답 보너스**: 10개 연속 정답 시 4글자 단어, 20개 연속 시 5글자 단어 등장
+
+### 2. 공룡 메모리 게임
+
+#### 게임 메커니즘
+- **카드 짝 맞추기**: 같은 공룡 카드를 찾아 짝을 맞추는 게임
+- **프리뷰 시간**: 각 레벨 시작 시 3초간 모든 카드 확인 가능
+- **터치 선택**: 카드를 터치하여 뒤집고 짝을 맞춤
+- **성공 조건**: 모든 카드 짝을 맞추면 다음 레벨로 진행
+
+#### 레벨 시스템
+- **레벨 1**: 2쌍 (4장) - 2x2 그리드
+- **레벨 2**: 3쌍 (6장) - 2x3 그리드
+- **레벨 3**: 4쌍 (8장) - 2x4 그리드
+- **레벨 4**: 5쌍 (10장) - 2x5 그리드
+- **레벨 5**: 6쌍 (12장) - 3x4 그리드
+
+#### 공룡 데이터베이스
+- **총 8종의 공룡**:
+  - 브라키오사우루스 🦕
+  - 티라노사우루스 🦖
+  - 트리케라톱스 🦴
+  - 벨로시랩터 🦎
+  - 스피노사우루스 🐊
+  - 안킬로사우루스 🐢
+  - 프테라노돈 🦗
+  - 스테고사우루스 🐉
+
+### 3. 개인화 기능
+- **조카 프로필**: 2명의 조카 사진 사용
+- **프로필 선택 화면**: 게임 시작 시 플레이어 선택
+- **게임 중 표시**: 선택한 조카 사진을 화면에 표시
+- **응원 메시지**: "○○야, 화이팅!" 등 이름과 함께 격려
+- **개인별 기록**: 각 조카별로 맞춘 개수 기록
+
+### 4. UI/UX 요구사항
+- **큰 버튼**: 어린이 손가락에 맞는 크기
+- **선명한 색상**: 눈에 잘 띄는 밝은 색상
+- **칭찬 효과**: 정답 시 시각/청각 피드백
+- **직관적인 인터페이스**: 복잡한 메뉴 없이 단순하게
+
+### 5. 음향 기능
+- **배경음악 (BGM)**: 게임 플레이 중 자동 재생
+- **음소거 버튼**: 🔊/🔇 토글로 소리 ON/OFF
+- **볼륨 최적화**: 어린이에게 적합한 볼륨 (30%)
+
+## 기술 스택
+- **프레임워크**: Next.js 16 (React 18)
+- **언어**: TypeScript
+- **스타일링**: Tailwind CSS + Custom CSS
+- **배포**: Next.js 웹 애플리케이션
+- **실행 환경**: 웹 브라우저 (갤럭시 탭 최적화)
+
+## 파일 구조
+```
+/
+├── README.md
+├── memory-game-README.md     # 메모리 게임 상세 설명
+├── BGM_다운로드_가이드.md      # 음향 파일 다운로드 가이드
+├── app/
+│   ├── page.tsx              # 게임 선택 메인 화면
+│   ├── components/
+│   │   ├── HangulGame.tsx    # 한글 배우기 게임
+│   │   └── MemoryGame.tsx    # 공룡 메모리 게임
+│   ├── hangul-game.css       # 게임 스타일
+│   ├── layout.tsx
+│   └── globals.css
+└── public/
+    ├── players/              # 플레이어 사진
+    │   ├── dowon.jpeg
+    │   └── seungwoo.jpeg
+    └── sounds/               # 음향 파일
+        ├── bgm.mp3          # 배경음악
+        └── cheer.mp3        # 환호 효과음
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 설치 및 실행 방법
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 개발 환경 실행
+```bash
+# 의존성 설치
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# 개발 서버 실행
+npm run dev
+```
 
-## Learn More
+### 로컬 접속
+- **PC**: http://localhost:3000
+- **갤럭시 탭** (같은 WiFi): http://[PC_IP주소]:3000
 
-To learn more about Next.js, take a look at the following resources:
+### 플레이어 정보 변경하기
+1. `app/page.tsx` 파일 열기
+2. 플레이어 정보 부분 수정 (약 289-291줄):
+```typescript
+const players: Player[] = [
+  { id: 1, name: '도원', image: '/players/dowon.jpeg', bgColor: 'bg-pink-400' },
+  { id: 2, name: '승우', image: '/players/seungwoo.jpeg', bgColor: 'bg-blue-400' }
+];
+```
+3. 사진 파일을 `public/players/` 폴더에 추가
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### BGM 변경하기
+1. 무료 음악 다운로드 (Pixabay Music, YouTube Audio Library 등)
+2. 파일을 `bgm.mp3`로 이름 변경
+3. `public/sounds/` 폴더에 복사
+4. 자세한 가이드는 `BGM_다운로드_가이드.md` 참조
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 게임 플레이 흐름
 
-## Deploy on Vercel
+### 공통 흐름
+1. **게임 선택 화면**
+   - 한글 배우기 or 공룡 메모리 게임 선택
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. **한글 배우기 선택 시**
+   - 속도 선택 (느림/보통/빠름)
+   - 플레이어 선택 (도원/승우)
+   - 게임 시작
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. **공룡 메모리 게임 선택 시**
+   - 플레이어 선택 (도원/승우)
+   - 게임 시작 (레벨 1부터)
+
+### 한글 배우기 게임 화면
+   - 상단: 제시어 그림 + 단어
+   - 중앙: 떨어지는 글자들
+   - 하단: 현재 선택한 글자 표시
+   - 좌측 상단: 플레이어 프로필 + 점수
+   - 우측 상단: 음소거 버튼 + 그만하기 버튼
+
+### 한글 배우기 - 정답 시
+   - 칭찬 애니메이션
+   - 효과음/시각 효과
+   - 다음 단어로 진행
+
+### 한글 배우기 - 오답/실패 시
+   - 재시도 버튼 표시
+   - 같은 단어 다시 도전
+
+### 메모리 게임 흐름
+1. **레벨 시작**
+   - 3초 카운트다운과 함께 모든 카드 확인
+
+2. **게임 진행**
+   - 카드 2개씩 뒤집어 짝 맞추기
+   - 맞으면 카드 고정, 틀리면 다시 뒤집힘
+
+3. **레벨 완료**
+   - 모든 짝 맞추면 축하 화면
+   - "다음 레벨" 버튼으로 진행
+
+4. **게임 완료**
+   - 레벨 5 완료 시 축하 화면
+   - "처음부터 다시" 또는 "나가기" 선택
+
+## 개발 진행 상황
+
+### 완료된 기능 ✅
+
+#### 한글 배우기 게임
+- [x] 기본 게임 로직 구현
+- [x] 200개 단어 데이터베이스 (동물, 곤충, 과일, 채소, 음식, 생활용품, 자연)
+- [x] 떨어지는 글자 애니메이션 (겹침 방지 로직 포함)
+- [x] 터치 입력 처리 (모바일 최적화)
+- [x] 속도 조절 기능 (느림/보통/빠름)
+- [x] 정답 시 칭찬 애니메이션 및 환호 효과음
+- [x] 플레이어 프로필 시스템 (사진 사용)
+- [x] 개인별 점수 기록
+- [x] 배경음악 (BGM) 재생
+- [x] 음소거 버튼
+- [x] 정답 글자가 땅에 닿으면 실패 처리
+- [x] 중복 클릭 방지
+- [x] 연속 정답 보너스 시스템 (10개, 20개)
+
+#### 메모리 게임
+- [x] 5단계 레벨 시스템 (2쌍→6쌍)
+- [x] 8종 공룡 카드 데이터베이스
+- [x] 카드 뒤집기 3D 애니메이션
+- [x] 3초 프리뷰 카운트다운
+- [x] 매칭 로직 및 성공/실패 처리
+- [x] 레벨 완료 및 게임 완료 화면
+- [x] 플레이어 선택 시스템
+
+#### 공통
+- [x] 게임 선택 화면
+- [x] Next.js 웹 애플리케이션
+- [x] 컴포넌트 기반 구조 (HangulGame, MemoryGame)
+
+### 추가 개선 예정
+- [ ] 누적 점수 로컬 저장
+- [ ] 학습 진행도 통계
+- [ ] 메모리 게임 BGM 및 효과음
+- [ ] 메모리 게임 개인별 기록
+
+## 향후 개선 아이디어
+- 음성 피드백 (단어 읽어주기)
+- 더 많은 게임 추가 (숫자 배우기, 색깔 배우기 등)
+- 부모 대시보드 (학습 진행도)
+- 오프라인 사용 가능 (PWA)
+- 난이도 조절 기능 (메모리 게임)
+
+## 라이센스 및 저작권
+
+### 프로젝트 라이센스
+개인 프로젝트 (비상업적 용도)
+
+### 배경음악 (BGM) 저작권
+본 프로젝트에 사용된 배경음악은 다음 무료 음원 제공 사이트에서 다운로드할 수 있습니다:
+
+#### 추천 무료 음원 사이트
+1. **Pixabay Music** (https://pixabay.com/music/)
+   - 라이센스: Pixabay Content License (완전 무료, 저작권 걱정 없음)
+   - 상업적/비상업적 용도 모두 가능
+   - 크레딧 표기 불필요
+
+2. **YouTube Audio Library**
+   - YouTube Studio → 오디오 보관함
+   - 라이센스: 일부 곡은 크레딧 표기 필요
+   - 무료 사용 가능
+
+3. **Incompetech** (https://incompetech.com/)
+   - 라이센스: Creative Commons BY 3.0
+   - 크레딧 표기 필요: "Music by Kevin MacLeod (incompetech.com)"
+
+4. **Bensound** (https://www.bensound.com/)
+   - 라이센스: 무료 버전 크레딧 표기 필요
+   - 크레딧: "Music from Bensound.com"
+
+5. **FreePD** (https://freepd.com/)
+   - 라이센스: Public Domain (퍼블릭 도메인)
+   - 완전 자유 사용
+
+**중요**: 실제 배포 시 사용한 음악 출처에 따라 적절한 크레딧을 표기하세요.
+
+### 이미지 저작권
+- 플레이어 사진: 개인 소유 (사용자가 직접 제공)
+- 이모지: 유니코드 표준 (무료 사용 가능)
+
+## 개발자 노트
+- 조카들의 집중력을 고려하여 한 세션은 5~10분 내외로 유지
+- 너무 많은 오답 선택지는 혼란을 줄 수 있으므로 3~4개 정도로 제한
+- 칭찬과 격려를 많이 해주는 것이 중요
