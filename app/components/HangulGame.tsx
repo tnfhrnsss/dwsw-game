@@ -553,21 +553,21 @@ export default function HangulGame({ onBack, speed }: HangulGameProps) {
   }, [gameState, currentWord, fallingLetters, selectedLetters]);
 
   return (
-    <div className="w-full h-screen overflow-hidden relative">
+    <div className="w-full min-h-screen overflow-y-auto">
       {/* 플레이어 선택 화면 */}
       {gameState === 'selectPlayer' && (
-        <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-blue-300 via-purple-300 to-pink-400 p-8">
-          <h2 className="dongle-font text-8xl font-bold text-white mb-16 drop-shadow-2xl">
+        <div className="flex flex-col items-center py-8 md:py-16 px-4 md:px-8 min-h-screen bg-gradient-to-br from-blue-300 via-purple-300 to-pink-400">
+          <h2 className="dongle-font text-6xl md:text-8xl font-bold text-white mb-8 md:mb-16 drop-shadow-2xl">
             누가 할까요? 🎮
           </h2>
-          <div className="grid grid-cols-2 gap-8 w-full max-w-4xl">
+          <div className="grid grid-cols-2 gap-4 md:gap-8 w-full max-w-4xl pb-8">
             {players.map((player) => (
               <button
                 key={player.id}
                 onClick={() => handleSelectPlayer(player)}
-                className={`${player.bgColor} rounded-3xl p-12 shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all`}
+                className={`${player.bgColor} rounded-3xl p-6 md:p-12 shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all`}
               >
-                <div className="relative w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden">
+                <div className="relative w-32 h-32 md:w-48 md:h-48 mx-auto mb-3 md:mb-6 rounded-full overflow-hidden">
                   <Image
                     src={player.image}
                     alt={player.name}
@@ -575,7 +575,7 @@ export default function HangulGame({ onBack, speed }: HangulGameProps) {
                     className="object-cover"
                   />
                 </div>
-                <div className="text-5xl font-bold text-white drop-shadow-lg">
+                <div className="text-3xl md:text-5xl font-bold text-white drop-shadow-lg">
                   {player.name}
                 </div>
               </button>
@@ -583,7 +583,7 @@ export default function HangulGame({ onBack, speed }: HangulGameProps) {
           </div>
           <button
             onClick={onBack}
-            className="mt-12 px-12 py-6 bg-gray-600 text-white text-3xl font-bold rounded-2xl hover:bg-gray-700 transition-all"
+            className="mt-6 md:mt-12 px-8 md:px-12 py-4 md:py-6 bg-gray-600 text-white text-2xl md:text-3xl font-bold rounded-2xl hover:bg-gray-700 transition-all"
           >
             ← 뒤로가기
           </button>
@@ -592,11 +592,11 @@ export default function HangulGame({ onBack, speed }: HangulGameProps) {
 
       {/* 게임 화면 */}
       {(gameState === 'playing' || gameState === 'success' || gameState === 'failed') && currentWord && selectedPlayer && (
-        <div className="relative w-full h-full bg-gradient-to-br from-cyan-200 via-blue-200 to-purple-300">
+        <div className="relative w-full min-h-screen bg-gradient-to-br from-cyan-200 via-blue-200 to-purple-300">
           {/* 상단 정보 바 */}
-          <div className="absolute top-0 left-0 right-0 bg-white bg-opacity-90 shadow-lg p-6 flex justify-between items-center z-20">
-            <div className="flex items-center gap-6">
-              <div className={`${selectedPlayer.bgColor} rounded-full p-2 relative w-20 h-20 overflow-hidden`}>
+          <div className="absolute top-0 left-0 right-0 bg-white bg-opacity-90 shadow-lg p-3 md:p-6 flex justify-between items-center z-20">
+            <div className="flex items-center gap-2 md:gap-6">
+              <div className={`${selectedPlayer.bgColor} rounded-full p-1 md:p-2 relative w-12 h-12 md:w-20 md:h-20 overflow-hidden`}>
                 <Image
                   src={selectedPlayer.image}
                   alt={selectedPlayer.name}
@@ -605,26 +605,26 @@ export default function HangulGame({ onBack, speed }: HangulGameProps) {
                 />
               </div>
               <div>
-                <p className="text-3xl font-bold text-gray-700">{selectedPlayer.name}</p>
-                <p className="text-2xl text-gray-500">맞춘 개수: {score}개 🌟</p>
-                <p className="text-xl text-gray-500">
+                <p className="text-lg md:text-3xl font-bold text-gray-700">{selectedPlayer.name}</p>
+                <p className="text-sm md:text-2xl text-gray-500">맞춘 개수: {score}개 🌟</p>
+                <p className="text-xs md:text-xl text-gray-500">
                   연속: {consecutiveCorrect}개
                   {consecutiveCorrect >= 20 && ' 🔥🔥🔥'}
                   {consecutiveCorrect >= 10 && consecutiveCorrect < 20 && ' 🔥🔥'}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4">
               <button
                 onClick={toggleMute}
-                className="px-6 py-4 bg-blue-500 text-white text-3xl font-bold rounded-2xl hover:bg-blue-600 transition-all"
+                className="px-3 md:px-6 py-2 md:py-4 bg-blue-500 text-white text-xl md:text-3xl font-bold rounded-2xl hover:bg-blue-600 transition-all"
                 title={isMuted ? '소리 켜기' : '소리 끄기'}
               >
                 {isMuted ? '🔇' : '🔊'}
               </button>
               <button
                 onClick={onBack}
-                className="px-8 py-4 bg-red-500 text-white text-2xl font-bold rounded-2xl hover:bg-red-600 transition-all"
+                className="px-4 md:px-8 py-2 md:py-4 bg-red-500 text-white text-sm md:text-2xl font-bold rounded-2xl hover:bg-red-600 transition-all"
               >
                 그만하기
               </button>
@@ -632,16 +632,16 @@ export default function HangulGame({ onBack, speed }: HangulGameProps) {
           </div>
 
           {/* 제시어 영역 */}
-          <div className="absolute top-32 left-0 right-0 flex flex-col items-center z-10">
-            <div className="bg-white rounded-3xl shadow-2xl p-8 flex items-center gap-8">
-              <div className="text-9xl">{currentWord.emoji}</div>
+          <div className="absolute top-20 md:top-32 left-0 right-0 flex flex-col items-center z-10 px-2 md:px-0">
+            <div className="bg-white rounded-3xl shadow-2xl p-4 md:p-8 flex flex-col md:flex-row items-center gap-4 md:gap-8">
+              <div className="text-6xl md:text-9xl">{currentWord.emoji}</div>
               <div>
-                <p className="text-6xl font-bold text-gray-800 dongle-font">{currentWord.word}</p>
-                <div className="flex gap-3 mt-4">
+                <p className="text-4xl md:text-6xl font-bold text-gray-800 dongle-font">{currentWord.word}</p>
+                <div className="flex gap-2 md:gap-3 mt-2 md:mt-4">
                   {getHangulLetters(currentWord.word).map((letter, index) => (
                     <div
                       key={index}
-                      className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl font-bold ${
+                      className={`w-10 h-10 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-xl md:text-3xl font-bold ${
                         selectedLetters[index]
                           ? 'bg-green-400 text-white'
                           : 'bg-gray-200 text-gray-400'
@@ -656,14 +656,14 @@ export default function HangulGame({ onBack, speed }: HangulGameProps) {
           </div>
 
           {/* 게임 영역 */}
-          <div ref={gameAreaRef} className="absolute top-80 left-0 right-0 bottom-0 overflow-hidden">
+          <div ref={gameAreaRef} className="absolute top-56 md:top-80 left-0 right-0 bottom-0 overflow-hidden">
             {fallingLetters.map((letter) => (
               <button
                 key={letter.id}
                 data-letter-id={letter.id}
                 onClick={() => handleLetterClick(letter)}
                 disabled={letter.clicked}
-                className={`falling-letter absolute rounded-2xl text-5xl font-bold w-24 h-24 flex items-center justify-center transition-colors transform ${
+                className={`falling-letter absolute rounded-2xl text-3xl md:text-5xl font-bold w-16 h-16 md:w-24 md:h-24 flex items-center justify-center transition-colors transform ${
                   letter.clicked
                     ? 'bg-gray-300 text-gray-400 cursor-not-allowed opacity-50 shadow-md'
                     : 'bg-white text-gray-900 hover:bg-yellow-200 cursor-pointer hover:scale-110 shadow-2xl border-2 border-gray-200'
@@ -687,10 +687,10 @@ export default function HangulGame({ onBack, speed }: HangulGameProps) {
           {/* 성공 오버레이 */}
           {gameState === 'success' && (
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
-              <div className="celebrate bg-white rounded-3xl p-16 text-center shadow-2xl">
-                <div className="text-9xl mb-6">🎉</div>
-                <p className="text-7xl font-bold text-green-500 dongle-font mb-4">정답!</p>
-                <p className="text-4xl text-gray-600">잘했어요, {selectedPlayer.name}! 🌟</p>
+              <div className="celebrate bg-white rounded-3xl p-8 md:p-16 text-center shadow-2xl mx-4">
+                <div className="text-6xl md:text-9xl mb-4 md:mb-6">🎉</div>
+                <p className="text-5xl md:text-7xl font-bold text-green-500 dongle-font mb-3 md:mb-4">정답!</p>
+                <p className="text-2xl md:text-4xl text-gray-600">잘했어요, {selectedPlayer.name}! 🌟</p>
               </div>
             </div>
           )}
@@ -698,13 +698,13 @@ export default function HangulGame({ onBack, speed }: HangulGameProps) {
           {/* 실패 오버레이 */}
           {gameState === 'failed' && (
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
-              <div className="shake bg-white rounded-3xl p-16 text-center shadow-2xl">
-                <div className="text-9xl mb-6">😅</div>
-                <p className="text-7xl font-bold text-orange-500 dongle-font mb-4">아쉬워요!</p>
-                <p className="text-4xl text-gray-600 mb-8">다시 해볼까요?</p>
+              <div className="shake bg-white rounded-3xl p-8 md:p-16 text-center shadow-2xl mx-4">
+                <div className="text-6xl md:text-9xl mb-4 md:mb-6">😅</div>
+                <p className="text-5xl md:text-7xl font-bold text-orange-500 dongle-font mb-3 md:mb-4">아쉬워요!</p>
+                <p className="text-2xl md:text-4xl text-gray-600 mb-6 md:mb-8">다시 해볼까요?</p>
                 <button
                   onClick={handleRetry}
-                  className="px-12 py-6 bg-gradient-to-r from-blue-400 to-purple-500 text-white text-4xl font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
+                  className="px-8 md:px-12 py-4 md:py-6 bg-gradient-to-r from-blue-400 to-purple-500 text-white text-2xl md:text-4xl font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
                 >
                   다시 하기 🔄
                 </button>

@@ -132,7 +132,7 @@ const nature: Word[] = [
   { word: 'rainbow', emoji: '🌈', koreanName: '무지개', level: 4 },
   { word: 'flower', emoji: '🌸', koreanName: '꽃', level: 2 },
   { word: 'tree', emoji: '🌳', koreanName: '나무', level: 1 },
-  { word: 'leaf', emoji: '🍃', koreanName: '잎', level: 2 },
+  { word: 'leaf', emoji: '🍃', koreanName: '잎', level: 4 },
   { word: 'mountain', emoji: '⛰️', koreanName: '산', level: 3 },
   { word: 'ocean', emoji: '🌊', koreanName: '바다', level: 3 },
   { word: 'fire', emoji: '🔥', koreanName: '불', level: 2 },
@@ -455,34 +455,34 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
   // 플레이어 선택 화면
   if (gameState === 'selectPlayer') {
     return (
-      <div className="w-full h-screen overflow-hidden relative bg-gradient-to-br from-blue-300 via-purple-300 to-pink-300">
-        <div className="flex flex-col items-center justify-center h-full p-8">
-          <div className="text-center space-y-8 mb-16">
-            <h1 className="dongle-font text-9xl font-bold text-white drop-shadow-2xl animate-bounce">
+      <div className="w-full min-h-screen overflow-y-auto bg-gradient-to-br from-blue-300 via-purple-300 to-pink-300">
+        <div className="flex flex-col items-center py-8 md:py-16 px-4 md:px-8">
+          <div className="text-center space-y-4 md:space-y-8 mb-8 md:mb-16">
+            <h1 className="dongle-font text-6xl md:text-9xl font-bold text-white drop-shadow-2xl animate-bounce">
               영어 듣기 게임 🎧
             </h1>
-            <p className="text-5xl text-white font-bold drop-shadow-lg">
+            <p className="text-3xl md:text-5xl text-white font-bold drop-shadow-lg">
               누가 할까요?
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mb-8">
+          <div className="grid grid-cols-2 gap-4 md:gap-8 w-full max-w-4xl mb-6 md:mb-8 pb-8">
             {players.map((player) => (
               <button
                 key={player.id}
                 onClick={() => handlePlayerSelect(player)}
-                className={`${player.bgColor} rounded-3xl p-12 shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all`}
+                className={`${player.bgColor} rounded-3xl p-6 md:p-12 shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all`}
               >
-                <div className="mb-6 flex justify-center">
+                <div className="mb-3 md:mb-6 flex justify-center">
                   <Image
                     src={player.image}
                     alt={player.name}
-                    width={200}
-                    height={200}
-                    className="rounded-full object-cover"
+                    width={120}
+                    height={120}
+                    className="rounded-full object-cover md:w-[200px] md:h-[200px]"
                   />
                 </div>
-                <h2 className="text-6xl font-bold text-white drop-shadow-lg dongle-font">
+                <h2 className="text-4xl md:text-6xl font-bold text-white drop-shadow-lg dongle-font">
                   {player.name}
                 </h2>
               </button>
@@ -491,7 +491,7 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
 
           <button
             onClick={onBack}
-            className="mt-8 py-6 px-12 bg-gray-600 text-white text-3xl font-bold rounded-2xl hover:bg-gray-700 transition-all"
+            className="mt-4 md:mt-8 py-4 md:py-6 px-8 md:px-12 bg-gray-600 text-white text-2xl md:text-3xl font-bold rounded-2xl hover:bg-gray-700 transition-all"
           >
             ← 뒤로가기
           </button>
@@ -503,21 +503,21 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
   // 듣기 단계
   if (gameState === 'listening') {
     return (
-      <div className="w-full h-screen overflow-hidden relative bg-gradient-to-br from-indigo-300 via-blue-300 to-cyan-300">
-        <div className="flex flex-col items-center justify-center h-full p-8">
-          <div className="text-center space-y-12">
-            <div className="text-9xl animate-pulse">🔊</div>
-            <h1 className="text-7xl font-bold text-white drop-shadow-2xl">
+      <div className="w-full min-h-screen overflow-y-auto bg-gradient-to-br from-indigo-300 via-blue-300 to-cyan-300">
+        <div className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8">
+          <div className="text-center space-y-6 md:space-y-12">
+            <div className="text-7xl md:text-9xl animate-pulse">🔊</div>
+            <h1 className="text-5xl md:text-7xl font-bold text-white drop-shadow-2xl">
               Listen carefully!
             </h1>
-            <p className="text-4xl text-white drop-shadow-lg">
+            <p className="text-2xl md:text-4xl text-white drop-shadow-lg">
               잘 듣고 기억하세요!
             </p>
-            <div className="flex gap-4 justify-center mt-8">
+            <div className="flex gap-2 md:gap-4 justify-center mt-4 md:mt-8">
               {[...Array(3)].map((_, i) => (
                 <div
                   key={i}
-                  className={`text-6xl ${i < remainingListens ? 'opacity-100' : 'opacity-30'}`}
+                  className={`text-4xl md:text-6xl ${i < remainingListens ? 'opacity-100' : 'opacity-30'}`}
                 >
                   ❤️
                 </div>
@@ -532,26 +532,26 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
   // 찾기/확인/성공/실패 단계
   if (question && (gameState === 'finding' || gameState === 'checking' || gameState === 'success' || gameState === 'failed')) {
     return (
-      <div className="w-full h-screen overflow-hidden relative bg-gradient-to-br from-green-200 via-blue-200 to-purple-200 p-4">
+      <div className="w-full min-h-screen overflow-y-auto bg-gradient-to-br from-green-200 via-blue-200 to-purple-200 p-2 md:p-4">
         {/* 상단바 */}
-        <div className="bg-white rounded-2xl shadow-lg p-4 mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="bg-white rounded-2xl shadow-lg p-2 md:p-4 mb-2 md:mb-4 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 md:gap-4">
             {selectedPlayer && (
               <Image
                 src={selectedPlayer.image}
                 alt={selectedPlayer.name}
-                width={50}
-                height={50}
-                className="rounded-full object-cover"
+                width={40}
+                height={40}
+                className="rounded-full object-cover md:w-[50px] md:h-[50px]"
               />
             )}
-            <span className="text-2xl font-bold text-black">{selectedPlayer?.name}</span>
+            <span className="text-lg md:text-2xl font-bold text-black">{selectedPlayer?.name}</span>
           </div>
-          <div className="text-2xl font-bold text-black">Level {currentLevel}</div>
+          <div className="text-lg md:text-2xl font-bold text-black">Level {currentLevel}</div>
           <button
             onClick={handleRelisten}
             disabled={remainingListens === 0 || isAudioPlaying}
-            className={`px-6 py-3 rounded-xl text-xl font-bold ${
+            className={`px-3 md:px-6 py-2 md:py-3 rounded-xl text-sm md:text-xl font-bold ${
               remainingListens > 0 && !isAudioPlaying
                 ? 'bg-blue-500 text-white hover:bg-blue-600'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -559,9 +559,9 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
           >
             🔊 다시듣기
           </button>
-          <div className="flex gap-2">
+          <div className="flex gap-1 md:gap-2">
             {[...Array(3)].map((_, i) => (
-              <span key={i} className={`text-3xl ${i < remainingListens ? 'opacity-100' : 'opacity-30'}`}>
+              <span key={i} className={`text-2xl md:text-3xl ${i < remainingListens ? 'opacity-100' : 'opacity-30'}`}>
                 ❤️
               </span>
             ))}
@@ -569,7 +569,7 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
         </div>
 
         {/* 그림 그리드 */}
-        <div className={`grid ${question.options.length <= 8 ? 'grid-cols-4' : 'grid-cols-4 md:grid-cols-6'} gap-6 mb-4`}>
+        <div className={`grid ${question.options.length <= 8 ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-3 md:grid-cols-6'} gap-2 md:gap-6 mb-2 md:mb-4`}>
           {question.options.map((word, idx) => {
             const isSelected = question.selectedWords.find(w => w.word === word.word);
             const isCorrect = gameState === 'success' && question.correctWords.find(w => w.word === word.word);
@@ -583,26 +583,26 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
                 className={`
                   aspect-square rounded-2xl flex flex-col items-center justify-center
                   transition-all transform hover:scale-105
-                  ${isSelected ? 'bg-green-300 border-4 border-green-600 scale-110 shadow-xl' : 'bg-white border-4 border-gray-300'}
+                  ${isSelected ? 'bg-green-300 border-2 md:border-4 border-green-600 scale-110 shadow-xl' : 'bg-white border-2 md:border-4 border-gray-300'}
                   ${isCorrect ? 'bg-green-400 border-green-700 animate-bounce' : ''}
                   ${isWrong ? 'bg-red-400 border-red-700' : ''}
                 `}
               >
-                <div className="text-8xl">{word.emoji}</div>
-                <div className="text-2xl font-bold text-gray-700 mt-2">{word.koreanName}</div>
+                <div className="text-4xl md:text-8xl">{word.emoji}</div>
+                <div className="text-xs md:text-2xl font-bold text-gray-700 mt-1 md:mt-2">{word.koreanName}</div>
               </button>
             );
           })}
         </div>
 
         {/* 하단 버튼 */}
-        <div className="flex gap-4 justify-center">
+        <div className="flex flex-wrap gap-2 md:gap-4 justify-center pb-4">
           {gameState === 'finding' && (
             <>
               <button
                 onClick={checkAnswer}
                 disabled={question.selectedWords.length !== question.correctWords.length}
-                className={`px-12 py-6 rounded-2xl text-3xl font-bold ${
+                className={`px-6 md:px-12 py-3 md:py-6 rounded-2xl text-xl md:text-3xl font-bold ${
                   question.selectedWords.length === question.correctWords.length
                     ? 'bg-green-500 text-white hover:bg-green-600'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -613,19 +613,19 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
 
               <button
                 onClick={handleShowHint}
-                className="px-12 py-6 bg-yellow-500 text-white text-3xl font-bold rounded-2xl hover:bg-yellow-600"
+                className="px-6 md:px-12 py-3 md:py-6 bg-yellow-500 text-white text-xl md:text-3xl font-bold rounded-2xl hover:bg-yellow-600"
               >
-                모르겠습니다
+                힌트
               </button>
             </>
           )}
 
           {gameState === 'success' && (
             <>
-              <div className="text-6xl animate-bounce">🎉</div>
+              <div className="text-4xl md:text-6xl animate-bounce">🎉</div>
               <button
                 onClick={handleNextLevel}
-                className="px-12 py-6 bg-gradient-to-r from-green-400 to-blue-500 text-white text-3xl font-bold rounded-2xl shadow-xl hover:shadow-2xl"
+                className="px-6 md:px-12 py-3 md:py-6 bg-gradient-to-r from-green-400 to-blue-500 text-white text-xl md:text-3xl font-bold rounded-2xl shadow-xl hover:shadow-2xl"
               >
                 다음 레벨 →
               </button>
@@ -634,10 +634,10 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
 
           {gameState === 'failed' && (
             <>
-              <div className="text-6xl">😢</div>
+              <div className="text-4xl md:text-6xl">😢</div>
               <button
                 onClick={handleRetry}
-                className="px-12 py-6 bg-orange-500 text-white text-3xl font-bold rounded-2xl hover:bg-orange-600"
+                className="px-6 md:px-12 py-3 md:py-6 bg-orange-500 text-white text-xl md:text-3xl font-bold rounded-2xl hover:bg-orange-600"
               >
                 다시하기
               </button>
@@ -646,7 +646,7 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
 
           <button
             onClick={onBack}
-            className="px-8 py-6 bg-gray-600 text-white text-2xl font-bold rounded-2xl hover:bg-gray-700"
+            className="px-4 md:px-8 py-3 md:py-6 bg-gray-600 text-white text-lg md:text-2xl font-bold rounded-2xl hover:bg-gray-700"
           >
             그만하기
           </button>
@@ -654,13 +654,13 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
 
         {/* 토스트 메시지 - 정답 힌트 */}
         {showToast && question && (
-          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-80 text-white px-12 py-8 rounded-3xl shadow-2xl z-50 animate-pulse">
-            <div className="text-4xl font-bold mb-4 text-center">정답은:</div>
-            <div className="flex gap-4 justify-center items-center flex-wrap">
+          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-80 text-white px-6 md:px-12 py-4 md:py-8 rounded-3xl shadow-2xl z-50 animate-pulse max-w-[90vw]">
+            <div className="text-2xl md:text-4xl font-bold mb-2 md:mb-4 text-center">정답은:</div>
+            <div className="flex gap-2 md:gap-4 justify-center items-center flex-wrap">
               {question.correctWords.map((word, idx) => (
                 <div key={idx} className="text-center">
-                  <div className="text-7xl mb-2">{word.emoji}</div>
-                  <div className="text-3xl font-bold">{word.koreanName}</div>
+                  <div className="text-5xl md:text-7xl mb-1 md:mb-2">{word.emoji}</div>
+                  <div className="text-xl md:text-3xl font-bold">{word.koreanName}</div>
                 </div>
               ))}
             </div>

@@ -293,21 +293,21 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
   };
 
   return (
-    <div className="w-full h-screen overflow-hidden relative bg-gradient-to-br from-green-300 via-teal-200 to-blue-300">
+    <div className="w-full min-h-screen overflow-y-auto bg-gradient-to-br from-green-300 via-teal-200 to-blue-300">
       {/* 플레이어 선택 화면 */}
       {gameState === 'selectPlayer' && (
-        <div className="flex flex-col items-center justify-center h-full p-8">
-          <h2 className="dongle-font text-8xl font-bold text-white mb-16 drop-shadow-2xl">
+        <div className="flex flex-col items-center py-8 md:py-16 px-4 md:px-8">
+          <h2 className="dongle-font text-6xl md:text-8xl font-bold text-white mb-8 md:mb-16 drop-shadow-2xl">
             누가 할까요? 🦕
           </h2>
-          <div className="grid grid-cols-2 gap-8 w-full max-w-4xl">
+          <div className="grid grid-cols-2 gap-4 md:gap-8 w-full max-w-4xl pb-8">
             {players.map((player) => (
               <button
                 key={player.id}
                 onClick={() => handleSelectPlayer(player)}
-                className={`${player.bgColor} rounded-3xl p-12 shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all`}
+                className={`${player.bgColor} rounded-3xl p-6 md:p-12 shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all`}
               >
-                <div className="relative w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden">
+                <div className="relative w-32 h-32 md:w-48 md:h-48 mx-auto mb-3 md:mb-6 rounded-full overflow-hidden">
                   <Image
                     src={player.image}
                     alt={player.name}
@@ -315,7 +315,7 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
                     className="object-cover"
                   />
                 </div>
-                <div className="text-5xl font-bold text-white drop-shadow-lg">
+                <div className="text-3xl md:text-5xl font-bold text-white drop-shadow-lg">
                   {player.name}
                 </div>
               </button>
@@ -323,7 +323,7 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
           </div>
           <button
             onClick={onBack}
-            className="mt-12 px-12 py-6 bg-gray-600 text-white text-3xl font-bold rounded-2xl hover:bg-gray-700 transition-all"
+            className="mt-6 md:mt-12 px-8 md:px-12 py-4 md:py-6 bg-gray-600 text-white text-2xl md:text-3xl font-bold rounded-2xl hover:bg-gray-700 transition-all"
           >
             ← 뒤로가기
           </button>
@@ -332,30 +332,30 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
 
       {/* 게임 화면 */}
       {(gameState === 'preview' || gameState === 'playing' || gameState === 'checking') && selectedPlayer && (
-        <div className="flex flex-col h-full p-8">
+        <div className="flex flex-col min-h-screen p-4 md:p-8">
           {/* 상단 정보 */}
-          <div className="flex justify-between items-center mb-8">
-            <div className="flex items-center gap-4">
-              <div className={`${selectedPlayer.bgColor} rounded-full p-2 relative w-16 h-16 overflow-hidden`}>
+          <div className="flex justify-between items-center mb-4 md:mb-8">
+            <div className="flex items-center gap-2 md:gap-4">
+              <div className={`${selectedPlayer.bgColor} rounded-full p-1 md:p-2 relative w-12 h-12 md:w-16 md:h-16 overflow-hidden`}>
                 <Image src={selectedPlayer.image} alt={selectedPlayer.name} fill className="object-cover" />
               </div>
               <div>
-                <p className="text-3xl font-bold text-gray-700">{selectedPlayer.name}</p>
-                <p className="text-2xl text-gray-500">공룡 메모리 게임 🦕</p>
+                <p className="text-xl md:text-3xl font-bold text-gray-700">{selectedPlayer.name}</p>
+                <p className="text-sm md:text-2xl text-gray-500">공룡 메모리 게임 🦕</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4">
               {/* 음소거 버튼 */}
               <button
                 onClick={toggleMute}
-                className="px-6 py-3 bg-blue-500 text-white text-2xl font-bold rounded-xl hover:bg-blue-600 transition-all"
+                className="px-3 md:px-6 py-2 md:py-3 bg-blue-500 text-white text-xl md:text-2xl font-bold rounded-xl hover:bg-blue-600 transition-all"
                 title={isMuted ? '소리 켜기' : '소리 끄기'}
               >
                 {isMuted ? '🔇' : '🔊'}
               </button>
               <button
                 onClick={onBack}
-                className="px-6 py-3 bg-red-500 text-white text-xl font-bold rounded-xl hover:bg-red-600"
+                className="px-3 md:px-6 py-2 md:py-3 bg-red-500 text-white text-sm md:text-xl font-bold rounded-xl hover:bg-red-600"
               >
                 그만하기
               </button>
@@ -365,7 +365,7 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
           {/* 카운트다운 */}
           {gameState === 'preview' && countdown > 0 && (
             <div className="absolute inset-0 flex items-center justify-center z-20">
-              <div className="text-9xl font-bold text-white drop-shadow-2xl animate-bounce">
+              <div className="text-7xl md:text-9xl font-bold text-white drop-shadow-2xl animate-bounce">
                 {countdown}
               </div>
             </div>
@@ -373,12 +373,12 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
 
           {/* 카드 그리드 */}
           <div className="flex-1 flex items-center justify-center">
-            <div className={`grid ${getGridClass()} gap-4 max-w-5xl`}>
+            <div className={`grid ${getGridClass()} gap-2 md:gap-4 max-w-5xl`}>
               {cards.map((card) => (
                 <button
                   key={card.id}
                   onClick={() => handleCardClick(card)}
-                  className={`relative w-48 h-60 rounded-2xl transform transition-all duration-300 ${
+                  className={`relative w-20 h-24 md:w-48 md:h-60 rounded-2xl transform transition-all duration-300 ${
                     card.isMatched ? '' : 'hover:scale-105'
                   }`}
                   style={{
@@ -392,18 +392,18 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
                     className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-xl"
                     style={{ backfaceVisibility: 'hidden' }}
                   >
-                    <span className="text-9xl">❓</span>
+                    <span className="text-5xl md:text-9xl">❓</span>
                   </div>
 
                   {/* 카드 앞면 */}
                   <div
-                    className="absolute inset-0 bg-white rounded-2xl flex flex-col items-center justify-center shadow-xl p-4"
+                    className="absolute inset-0 bg-white rounded-2xl flex flex-col items-center justify-center shadow-xl p-2 md:p-4"
                     style={{
                       backfaceVisibility: 'hidden',
                       transform: 'rotateY(180deg)'
                     }}
                   >
-                    <div className="relative w-32 h-32 mb-2">
+                    <div className="relative w-14 h-14 md:w-32 md:h-32 mb-1 md:mb-2">
                       <Image
                         src={card.image}
                         alt={card.name}
@@ -411,7 +411,7 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
                         className="object-contain"
                       />
                     </div>
-                    <span className="text-lg font-bold text-gray-700">{card.name}</span>
+                    <span className="text-xs md:text-lg font-bold text-gray-700">{card.name}</span>
                   </div>
                 </button>
               ))}
@@ -423,13 +423,13 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
       {/* 레벨 완료 화면 */}
       {gameState === 'levelComplete' && (
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
-          <div className="bg-white rounded-3xl p-16 text-center shadow-2xl">
-            <div className="text-9xl mb-6">🎉</div>
-            <p className="text-7xl font-bold text-green-500 dongle-font mb-4">레벨 완료!</p>
-            <p className="text-4xl text-gray-600 mb-8">잘했어요, {selectedPlayer?.name}! 🌟</p>
+          <div className="bg-white rounded-3xl p-8 md:p-16 text-center shadow-2xl mx-4">
+            <div className="text-6xl md:text-9xl mb-4 md:mb-6">🎉</div>
+            <p className="text-5xl md:text-7xl font-bold text-green-500 dongle-font mb-3 md:mb-4">레벨 완료!</p>
+            <p className="text-2xl md:text-4xl text-gray-600 mb-6 md:mb-8">잘했어요, {selectedPlayer?.name}! 🌟</p>
             <button
               onClick={handleNextLevel}
-              className="px-12 py-6 bg-gradient-to-r from-blue-400 to-purple-500 text-white text-4xl font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
+              className="px-8 md:px-12 py-4 md:py-6 bg-gradient-to-r from-blue-400 to-purple-500 text-white text-2xl md:text-4xl font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
             >
               다음 레벨 🚀
             </button>
@@ -440,20 +440,20 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
       {/* 게임 완료 화면 */}
       {gameState === 'gameComplete' && (
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
-          <div className="bg-white rounded-3xl p-16 text-center shadow-2xl">
-            <div className="text-9xl mb-6">🏆</div>
-            <p className="text-7xl font-bold text-yellow-500 dongle-font mb-4">모든 레벨 완료!</p>
-            <p className="text-4xl text-gray-600 mb-8">{selectedPlayer?.name} 최고! 🎉</p>
-            <div className="flex gap-4">
+          <div className="bg-white rounded-3xl p-8 md:p-16 text-center shadow-2xl mx-4">
+            <div className="text-6xl md:text-9xl mb-4 md:mb-6">🏆</div>
+            <p className="text-5xl md:text-7xl font-bold text-yellow-500 dongle-font mb-3 md:mb-4">모든 레벨 완료!</p>
+            <p className="text-2xl md:text-4xl text-gray-600 mb-6 md:mb-8">{selectedPlayer?.name} 최고! 🎉</p>
+            <div className="flex flex-col md:flex-row gap-3 md:gap-4">
               <button
                 onClick={handleRestart}
-                className="px-12 py-6 bg-gradient-to-r from-green-400 to-blue-500 text-white text-4xl font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
+                className="px-8 md:px-12 py-4 md:py-6 bg-gradient-to-r from-green-400 to-blue-500 text-white text-2xl md:text-4xl font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
               >
                 처음부터 다시 🔄
               </button>
               <button
                 onClick={onBack}
-                className="px-12 py-6 bg-gray-600 text-white text-4xl font-bold rounded-2xl hover:bg-gray-700 transition-all"
+                className="px-8 md:px-12 py-4 md:py-6 bg-gray-600 text-white text-2xl md:text-4xl font-bold rounded-2xl hover:bg-gray-700 transition-all"
               >
                 나가기
               </button>
