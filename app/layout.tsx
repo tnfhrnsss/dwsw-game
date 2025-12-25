@@ -3,7 +3,7 @@ import "./globals.css";
 import ServiceWorkerRegistration from "./components/ServiceWorkerRegistration";
 
 export const metadata: Metadata = {
-  title: "승우-도원 한글배우기 게임",
+  title: "도원-승우 게임",
   description: "고모와 클로드 재능기부",
   manifest: "/dwsw-game/manifest.json",
   appleWebApp: {

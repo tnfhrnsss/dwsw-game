@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import HangulGame from './components/HangulGame';
 import MemoryGame from './components/MemoryGame';
+import EnglishListeningGame from './components/EnglishListeningGame';
 import './hangul-game.css';
 
-type GameType = 'hangul' | 'memory' | null;
+type GameType = 'hangul' | 'memory' | 'english' | null;
 type Speed = 'slow' | 'medium' | 'fast';
 
 export default function Home() {
@@ -28,6 +29,11 @@ export default function Home() {
     setSelectedGame('memory');
   };
 
+  // 영어 게임 선택
+  const handleSelectEnglishGame = () => {
+    setSelectedGame('english');
+  };
+
   // 게임 선택 화면으로 돌아가기
   const handleBackToGameSelection = () => {
     setSelectedGame(null);
@@ -46,6 +52,10 @@ export default function Home() {
 
   if (selectedGame === 'memory') {
     return <MemoryGame onBack={handleBackToGameSelection} />;
+  }
+
+  if (selectedGame === 'english') {
+    return <EnglishListeningGame onBack={handleBackToGameSelection} />;
   }
 
   // 속도 선택 화면 (한글 게임용)
@@ -114,7 +124,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl">
           {/* 한글 게임 카드 */}
           <button
             onClick={handleSelectHangulGame}
@@ -140,6 +150,20 @@ export default function Home() {
             </h2>
             <p className="text-2xl text-white drop-shadow-md">
               같은 공룡 카드를 찾아보세요!
+            </p>
+          </button>
+
+          {/* 영어 듣기 게임 카드 */}
+          <button
+            onClick={handleSelectEnglishGame}
+            className="bg-gradient-to-br from-purple-300 via-pink-300 to-rose-300 rounded-3xl p-12 shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all"
+          >
+            <div className="text-9xl mb-6">🎧</div>
+            <h2 className="text-6xl font-bold text-white drop-shadow-lg mb-4 dongle-font">
+              영어 듣기 게임
+            </h2>
+            <p className="text-2xl text-white drop-shadow-md">
+              영어 단어를 듣고 찾아보세요!
             </p>
           </button>
         </div>
