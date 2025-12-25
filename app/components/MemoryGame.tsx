@@ -16,6 +16,10 @@ const dinosaurs = [
   { id: 6, image: getAssetPath('/dinosaurs/ankylosaurus.png'), name: '안킬로사우루스' },
   { id: 7, image: getAssetPath('/dinosaurs/pteranodon.png'), name: '프테라노돈' },
   { id: 8, image: getAssetPath('/dinosaurs/stegosaurus.png'), name: '스테고사우루스' },
+  { id: 9, image: getAssetPath('/dinosaurs/diplodocus.png'), name: '디플로도쿠스' },
+  { id: 10, image: getAssetPath('/dinosaurs/sauropelta.png'), name: '사우로펠타' },
+  { id: 11, image: getAssetPath('/dinosaurs/dracorex.png'), name: '드라코렉스' },
+  { id: 12, image: getAssetPath('/dinosaurs/allosaurus.png'), name: '알로사우루스' },
 ];
 
 type GameState = 'start' | 'selectPlayer' | 'preview' | 'playing' | 'checking' | 'levelComplete' | 'gameComplete';
