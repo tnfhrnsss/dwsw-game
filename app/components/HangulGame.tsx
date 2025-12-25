@@ -495,7 +495,7 @@ export default function HangulGame({ onBack, speed }: HangulGameProps) {
 
     if (typeof window !== 'undefined' && !cheerSoundRef.current) {
       cheerSoundRef.current = new Audio(getAssetPath('/sounds/cheer.mp3'));
-      cheerSoundRef.current.volume = 0.5;
+      cheerSoundRef.current.volume = 0.3;
     }
 
     if (gameState === 'playing' && bgmRef.current && !isMuted) {

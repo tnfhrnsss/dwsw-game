@@ -62,10 +62,11 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
     { id: 2, name: '승우', image: getAssetPath('/players/seungwoo.jpeg'), bgColor: 'bg-blue-400' }
   ];
 
-  // 카드 생성 및 섞기 - 4장(2쌍) 또는 6장(3쌍) 랜덤
+  // 카드 생성 및 섞기 - 4장(2쌍), 6장(3쌍), 또는 8장(4쌍) 랜덤
   const createCards = () => {
-    // 랜덤하게 2쌍 또는 3쌍 선택
-    const pairCount = Math.random() < 0.5 ? 2 : 3;
+    // 랜덤하게 2쌍, 3쌍, 또는 4쌍 선택
+    const rand = Math.random();
+    const pairCount = rand < 0.33 ? 2 : rand < 0.66 ? 3 : 4;
 
     // 공룡을 랜덤하게 섞은 후 필요한 만큼만 선택
     const shuffledDinos = [...dinosaurs].sort(() => Math.random() - 0.5);
@@ -159,6 +160,13 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
       ));
       setMatchedPairs(newMatchedPairs);
 
+      // 매칭 성공 시 BGM이 계속 재생되도록 보장
+      if (bgmRef.current && bgmRef.current.paused && !isMuted) {
+        bgmRef.current.play().catch(err => {
+          console.log('BGM 재생 실패:', err);
+        });
+      }
+
       // 모든 짝 맞췄는지 확인 - 현재 카드 수 / 2 = 총 쌍 개수
       const totalPairs = cards.length / 2;
       if (newMatchedPairs === totalPairs) {
@@ -168,6 +176,15 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
           cheerSoundRef.current.play().catch(err => {
             console.log('환호 효과음 재생 실패:', err);
           });
+
+          // 환호 효과음 재생 후 BGM이 멈췄다면 다시 재생
+          setTimeout(() => {
+            if (bgmRef.current && bgmRef.current.paused && !isMuted) {
+              bgmRef.current.play().catch(err => {
+                console.log('BGM 재생 실패:', err);
+              });
+            }
+          }, 100);
         }
 
         // 1초 후 다음 라운드 시작
@@ -215,14 +232,16 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
     // 환호 효과음 객체 생성
     if (typeof window !== 'undefined' && !cheerSoundRef.current) {
       cheerSoundRef.current = new Audio(getAssetPath('/sounds/cheer.mp3'));
-      cheerSoundRef.current.volume = 0.5; // 볼륨 50%
+      cheerSoundRef.current.volume = 0.3; // 볼륨 50%
     }
 
-    // 게임 시작 시 BGM 재생
+    // 게임 시작 시 BGM 재생 (이미 재생 중이면 재생하지 않음)
     if ((gameState === 'playing' || gameState === 'preview') && bgmRef.current && !isMuted) {
-      bgmRef.current.play().catch(err => {
-        console.log('BGM 자동재생 실패 (사용자 인터랙션 필요):', err);
-      });
+      if (bgmRef.current.paused) {
+        bgmRef.current.play().catch(err => {
+          console.log('BGM 자동재생 실패 (사용자 인터랙션 필요):', err);
+        });
+      }
     }
 
     // 게임 종료 시 BGM 정지
@@ -269,6 +288,7 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
     const totalCards = cards.length;
     if (totalCards === 4) return 'grid-cols-2'; // 2x2 (4장)
     if (totalCards === 6) return 'grid-cols-2'; // 3x2 (6장)
+    if (totalCards === 8) return 'grid-cols-4'; // 2x4 (8장)
     return 'grid-cols-2'; // 기본값
   };
 
