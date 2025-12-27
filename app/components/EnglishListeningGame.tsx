@@ -225,9 +225,9 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
     const newBalloons: Balloon[] = allBalloonWords.map((word, idx) => ({
       id: idx,
       word,
-      left: 5 + Math.random() * 85, // 5%-90% 사이 랜덤 위치
-      delay: Math.random() * 1000, // 0-1초 딜레이
-      duration: 8000 + Math.random() * 4000, // 8-12초 동안 올라감
+      left: 5 + (idx * 10) + Math.random() * 5, // 각 풍선마다 10% 간격 + 약간의 랜덤
+      delay: idx * 300 + Math.random() * 500, // 0.3초씩 시차 + 랜덤
+      duration: 8000 + Math.random() * 5000, // 8-13초 동안 올라감
     }));
 
     setBalloons(newBalloons);
@@ -533,7 +533,7 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
                 {balloon.word.emoji}
               </div>
               {/* 한글 이름 */}
-              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded-lg shadow-lg whitespace-nowrap">
+              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded-lg shadow-lg whitespace-nowrap z-10">
                 <span className="text-xs md:text-lg font-bold text-gray-800">
                   {balloon.word.koreanName}
                 </span>

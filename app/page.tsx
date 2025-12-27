@@ -170,7 +170,7 @@ export default function Home() {
           >
             <div className="text-6xl md:text-9xl mb-3 md:mb-6">🎧</div>
             <h2 className="text-4xl md:text-6xl font-bold text-white drop-shadow-lg mb-2 md:mb-4 dongle-font">
-              영어 듣기 게임
+              풍선 영어 게임
             </h2>
             <p className="text-lg md:text-2xl text-white drop-shadow-md">
               영어 단어를 듣고 찾아보세요!
