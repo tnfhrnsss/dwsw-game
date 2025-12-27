@@ -490,7 +490,7 @@ export default function HangulGame({ onBack, speed }: HangulGameProps) {
     if (typeof window !== 'undefined' && !bgmRef.current) {
       bgmRef.current = new Audio(getAssetPath('/sounds/bgm.mp3'));
       bgmRef.current.loop = true;
-      bgmRef.current.volume = 0.3;
+      bgmRef.current.volume = 0.15;
     }
 
     if (typeof window !== 'undefined' && !cheerSoundRef.current) {

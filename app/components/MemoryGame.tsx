@@ -226,7 +226,7 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
     if (typeof window !== 'undefined' && !bgmRef.current) {
       bgmRef.current = new Audio(getAssetPath('/sounds/bgm.mp3'));
       bgmRef.current.loop = true;
-      bgmRef.current.volume = 0.3; // 볼륨 30%
+      bgmRef.current.volume = 0.15; // 볼륨 15%
     }
 
     // 환호 효과음 객체 생성

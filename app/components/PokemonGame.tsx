@@ -191,7 +191,7 @@ export default function PokemonGame({ onBack }: PokemonGameProps) {
     if (!bgmRef.current) {
       bgmRef.current = new Audio(getAssetPath('/sounds/bgm.mp3'));
       bgmRef.current.loop = true;
-      bgmRef.current.volume = 0.3;
+      bgmRef.current.volume = 0.15;
     }
 
     if (!cheerSoundRef.current) {

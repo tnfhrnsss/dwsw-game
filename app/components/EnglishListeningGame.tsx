@@ -321,7 +321,7 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
   useEffect(() => {
     bgmRef.current = new Audio(getAssetPath('/sounds/bgm.mp3'));
     bgmRef.current.loop = true;
-    bgmRef.current.volume = 0.3;
+    bgmRef.current.volume = 0.15;
 
     cheerSoundRef.current = new Audio(getAssetPath('/sounds/cheer.mp3'));
     cheerSoundRef.current.volume = 0.5;
