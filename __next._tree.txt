@@ -1,3 +1,3 @@
 :HL["/dwsw-game/_next/static/chunks/3fd7ca515eabf684.css","style"]
 :HL["/dwsw-game/_next/static/chunks/46a779aeae74a74e.css","style"]
-0:{"buildId":"-68HhFzuN4RSLedeWHe4m","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":true},"staleTime":300}
+0:{"buildId":"1pQeRyMrIEjJ8bZkcVO23","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":true},"staleTime":300}
