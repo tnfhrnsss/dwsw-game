@@ -179,6 +179,7 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
   const [remainingListens, setRemainingListens] = useState(3);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [speechRate, setSpeechRate] = useState(0.5); // 음성 속도: 0.3(느리게), 0.5(정상), 0.7(빠르게)
   const cheerSoundRef = useRef<HTMLAudioElement | null>(null);
 
   const players: Player[] = [
@@ -275,7 +276,7 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
       const text = words.map(w => w.word).join(', ');
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'en-US';
-      utterance.rate = 0.5; // 음성 속도 (0.1 ~ 10, 기본값 1) - 매우 천천히
+      utterance.rate = speechRate; // 음성 속도 (0.3: 느리게, 0.5: 정상, 0.7: 빠르게)
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
 
@@ -294,8 +295,11 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
 
       window.speechSynthesis.speak(utterance);
 
-      // 안전장치: 음성 길이 추정 (rate 0.2이므로 단어당 7초 + 쉼표 2초)
-      const estimatedDuration = words.length * 7000 + (words.length - 1) * 2000 + 1000;
+      // 안전장치: 음성 길이 추정 (속도에 따라 조정)
+      const baseTimePerWord = 3500; // 기본 단어당 시간
+      const basePauseTime = 1000; // 기본 쉼표 시간
+      const speedFactor = 0.5 / speechRate; // 속도 보정 계수
+      const estimatedDuration = (words.length * baseTimePerWord + (words.length - 1) * basePauseTime) * speedFactor + 1000;
       setTimeout(transitionToFinding, estimatedDuration);
     } else {
       // Web Speech API 미지원 시 바로 찾기 단계로
@@ -548,6 +552,41 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
             <span className="text-lg md:text-2xl font-bold text-black">{selectedPlayer?.name}</span>
           </div>
           <div className="text-lg md:text-2xl font-bold text-black">Level {currentLevel}</div>
+
+          {/* 속도 조절 버튼 */}
+          <div className="flex gap-1 md:gap-2 items-center">
+            <button
+              onClick={() => setSpeechRate(0.3)}
+              className={`px-2 md:px-4 py-1 md:py-2 rounded-lg text-xs md:text-lg font-bold transition-all ${
+                speechRate === 0.3
+                  ? 'bg-purple-500 text-white shadow-lg'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              느리게
+            </button>
+            <button
+              onClick={() => setSpeechRate(0.5)}
+              className={`px-2 md:px-4 py-1 md:py-2 rounded-lg text-xs md:text-lg font-bold transition-all ${
+                speechRate === 0.5
+                  ? 'bg-purple-500 text-white shadow-lg'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              정상
+            </button>
+            <button
+              onClick={() => setSpeechRate(0.7)}
+              className={`px-2 md:px-4 py-1 md:py-2 rounded-lg text-xs md:text-lg font-bold transition-all ${
+                speechRate === 0.7
+                  ? 'bg-purple-500 text-white shadow-lg'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              빠르게
+            </button>
+          </div>
+
           <button
             onClick={handleRelisten}
             disabled={remainingListens === 0 || isAudioPlaying}
