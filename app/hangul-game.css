@@ -58,6 +58,26 @@ body {
   50% { opacity: 1; transform: scale(1); }
 }
 
+@keyframes shape-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes choice-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.6);
+  }
+}
+
 .falling-letter {
   animation: fall linear forwards;
 }
@@ -72,4 +92,13 @@ body {
 
 .sparkle {
   animation: sparkle 1s ease-in-out;
+}
+
+.shape-view {
+  animation: shape-enter 0.5s ease-out;
+}
+
+.choice-selected {
+  border: 4px solid #10B981;
+  animation: choice-pulse 1s infinite;
 }
