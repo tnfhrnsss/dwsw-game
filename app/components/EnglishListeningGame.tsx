@@ -275,7 +275,7 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
       const text = words.map(w => w.word).join(', ');
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'en-US';
-      utterance.rate = 0.2; // 음성 속도 (0.1 ~ 10, 기본값 1) - 매우 천천히
+      utterance.rate = 0.5; // 음성 속도 (0.1 ~ 10, 기본값 1) - 매우 천천히
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
 
