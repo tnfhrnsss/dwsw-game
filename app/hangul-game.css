@@ -78,8 +78,27 @@ body {
   }
 }
 
+@keyframes rise {
+  from {
+    bottom: -150px;
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  to {
+    bottom: 100vh;
+    opacity: 1;
+  }
+}
+
 .falling-letter {
   animation: fall linear forwards;
+}
+
+.balloon {
+  animation: rise linear forwards;
+  bottom: -150px;
 }
 
 .celebrate {

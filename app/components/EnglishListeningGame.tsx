@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { getAssetPath } from '../lib/basePath';
 
 // 게임 상태 타입
-type GameState = 'selectPlayer' | 'listening' | 'finding' | 'checking' | 'success' | 'failed' | 'levelComplete';
+type GameState = 'selectPlayer' | 'listening' | 'playing' | 'success' | 'failed';
 
 // 플레이어 인터페이스
 interface Player {
@@ -13,12 +13,6 @@ interface Player {
   name: string;
   image: string;
   bgColor: string;
-  progress: {
-    currentLevel: number;
-    maxLevel: number;
-    totalGamesPlayed: number;
-    correctAnswers: number;
-  };
 }
 
 // 단어 인터페이스
@@ -29,12 +23,13 @@ interface Word {
   level: number;
 }
 
-// 문제 인터페이스
-interface Question {
-  level: number;
-  correctWords: Word[];
-  options: Word[];
-  selectedWords: Word[];
+// 풍선 인터페이스
+interface Balloon {
+  id: number;
+  word: Word;
+  left: number; // 0-100% 위치
+  delay: number; // 시작 딜레이 (ms)
+  duration: number; // 올라가는 속도 (ms)
 }
 
 // 컴포넌트 Props
@@ -174,12 +169,13 @@ const allWords = [...animals, ...fruits, ...colors, ...numbers, ...nature, ...ve
 export default function EnglishListeningGame({ onBack }: EnglishListeningGameProps) {
   const [gameState, setGameState] = useState<GameState>('selectPlayer');
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
-  const [currentLevel, setCurrentLevel] = useState(1);
-  const [question, setQuestion] = useState<Question | null>(null);
-  const [remainingListens, setRemainingListens] = useState(3);
+  const [correctWord, setCorrectWord] = useState<Word | null>(null);
+  const [balloons, setBalloons] = useState<Balloon[]>([]);
+  const [streak, setStreak] = useState(0); // 연속 정답 카운터
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const [speechRate, setSpeechRate] = useState(0.5); // 음성 속도: 0.3(느리게), 0.5(정상), 0.7(빠르게)
+  const [speechRate, setSpeechRate] = useState(0.5);
+  const [isMuted, setIsMuted] = useState(false);
+  const bgmRef = useRef<HTMLAudioElement | null>(null);
   const cheerSoundRef = useRef<HTMLAudioElement | null>(null);
 
   const players: Player[] = [
@@ -188,273 +184,181 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
       name: '도원',
       image: getAssetPath('/players/dowon.jpeg'),
       bgColor: 'bg-pink-400',
-      progress: {
-        currentLevel: 1,
-        maxLevel: 1,
-        totalGamesPlayed: 0,
-        correctAnswers: 0
-      }
     },
     {
       id: 2,
       name: '승우',
       image: getAssetPath('/players/seungwoo.jpeg'),
       bgColor: 'bg-blue-400',
-      progress: {
-        currentLevel: 1,
-        maxLevel: 1,
-        totalGamesPlayed: 0,
-        correctAnswers: 0
-      }
     }
   ];
 
-  // 레벨에 따른 단어 개수 결정
-  // 같은 단어 개수로 10번 성공해야 다음 단계로
-  const getWordCount = (level: number): number => {
-    if (level <= 10) return 2;  // 레벨 1-10: 2개 단어
-    if (level <= 20) return 3;  // 레벨 11-20: 3개 단어
-    if (level <= 30) return 4;  // 레벨 21-30: 4개 단어
-    if (level <= 40) return 5;  // 레벨 31-40: 5개 단어
-    return 6;                   // 레벨 41+: 6개 단어
+  // 연속 정답에 따른 단어 레벨 결정
+  const getWordLevel = (streak: number): number => {
+    if (streak < 3) return Math.floor(Math.random() * 2) + 1; // 레벨 1-2
+    if (streak < 6) return Math.floor(Math.random() * 2) + 3; // 레벨 3-4
+    return Math.floor(Math.random() * 2) + 5; // 레벨 5-6
   };
 
   // 레벨에 맞는 랜덤 단어 선택
-  const selectWords = (count: number, gameLevel: number): Word[] => {
-    // 레벨별 최대 단어 난이도 결정
-    let maxWordLevel = 2; // 기본값
-    if (gameLevel <= 10) maxWordLevel = 2;      // 레벨 1-10: 난이도 1-2 단어
-    else if (gameLevel <= 20) maxWordLevel = 3; // 레벨 11-20: 난이도 1-3 단어
-    else if (gameLevel <= 30) maxWordLevel = 4; // 레벨 21-30: 난이도 1-4 단어
-    else if (gameLevel <= 40) maxWordLevel = 5; // 레벨 31-40: 난이도 1-5 단어
-    else maxWordLevel = 6;                      // 레벨 41+: 난이도 1-6 단어
-
-    // 현재 레벨에 맞는 단어만 필터링
-    const availableWords = allWords.filter(w => w.level <= maxWordLevel);
-
-    // 랜덤 섞기
-    const shuffled = [...availableWords].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, count);
-  };
-
-  // 오답 선택지 생성
-  const generateOptions = (correctWords: Word[], totalOptions: number): Word[] => {
-    const wrongWords = allWords.filter(
-      w => !correctWords.find(c => c.word === w.word)
-    );
-    const shuffledWrong = wrongWords.sort(() => Math.random() - 0.5);
-    const wrongCount = totalOptions - correctWords.length;
-
-    return [...correctWords, ...shuffledWrong.slice(0, wrongCount)]
-      .sort(() => Math.random() - 0.5);
+  const selectWord = (maxLevel: number): Word => {
+    const availableWords = allWords.filter(w => w.level <= maxLevel);
+    return availableWords[Math.floor(Math.random() * availableWords.length)];
   };
 
   // 문제 생성
-  const createQuestion = (level: number): Question => {
-    const wordCount = getWordCount(level);
-    const screenItemCount = wordCount <= 3 ? 8 : 12;
+  const createQuestion = () => {
+    const wordLevel = getWordLevel(streak);
+    const correct = selectWord(wordLevel);
+    setCorrectWord(correct);
 
-    const correctWords = selectWords(wordCount, level); // level 파라미터 추가
-    const allOptions = generateOptions(correctWords, screenItemCount);
+    // 오답 단어들 선택 (8-10개 풍선)
+    const balloonCount = 8 + Math.floor(Math.random() * 3); // 8-10개
+    const wrongWords = allWords
+      .filter(w => w.word !== correct.word)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, balloonCount - 1);
 
-    return {
-      level,
-      correctWords,
-      options: allOptions,
-      selectedWords: []
-    };
+    // 정답과 오답을 섞어서 풍선 생성
+    const allBalloonWords = [correct, ...wrongWords].sort(() => Math.random() - 0.5);
+
+    const newBalloons: Balloon[] = allBalloonWords.map((word, idx) => ({
+      id: idx,
+      word,
+      left: 5 + Math.random() * 85, // 5%-90% 사이 랜덤 위치
+      delay: Math.random() * 1000, // 0-1초 딜레이
+      duration: 8000 + Math.random() * 4000, // 8-12초 동안 올라감
+    }));
+
+    setBalloons(newBalloons);
+    return correct;
   };
 
   // Web Speech API로 음성 재생
-  const speak = (words: Word[]) => {
+  const speak = (word: Word) => {
     if ('speechSynthesis' in window) {
       setIsAudioPlaying(true);
-
-      // 기존 음성 정지
       window.speechSynthesis.cancel();
 
-      const text = words.map(w => w.word).join(', ');
-      const utterance = new SpeechSynthesisUtterance(text);
+      const utterance = new SpeechSynthesisUtterance(word.word);
       utterance.lang = 'en-US';
-      utterance.rate = speechRate; // 음성 속도 (0.3: 느리게, 0.5: 정상, 0.7: 빠르게)
+      utterance.rate = speechRate;
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
 
-      let transitioned = false;
-
-      const transitionToFinding = () => {
-        if (!transitioned) {
-          transitioned = true;
-          setIsAudioPlaying(false);
-          setGameState('finding');
-        }
+      utterance.onend = () => {
+        setIsAudioPlaying(false);
+        setGameState('playing');
       };
 
-      utterance.onend = transitionToFinding;
-      utterance.onerror = transitionToFinding;
+      utterance.onerror = () => {
+        setIsAudioPlaying(false);
+        setGameState('playing');
+      };
 
       window.speechSynthesis.speak(utterance);
-
-      // 안전장치: 음성 길이 추정 (속도에 따라 조정)
-      const baseTimePerWord = 3500; // 기본 단어당 시간
-      const basePauseTime = 1000; // 기본 쉼표 시간
-      const speedFactor = 0.5 / speechRate; // 속도 보정 계수
-      const estimatedDuration = (words.length * baseTimePerWord + (words.length - 1) * basePauseTime) * speedFactor + 1000;
-      setTimeout(transitionToFinding, estimatedDuration);
     } else {
-      // Web Speech API 미지원 시 바로 찾기 단계로
-      setIsAudioPlaying(false);
-      setGameState('finding');
+      setGameState('playing');
     }
   };
 
   // 플레이어 선택
   const handlePlayerSelect = (player: Player) => {
     setSelectedPlayer(player);
-    const newQuestion = createQuestion(1);
-    setQuestion(newQuestion);
+    setStreak(0);
+    const word = createQuestion();
     setGameState('listening');
     setTimeout(() => {
-      speak(newQuestion.correctWords);
+      speak(word);
     }, 500);
   };
 
-  // 터치 소리 재생 함수
-  const playTapSound = () => {
-    try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
+  // 풍선 클릭
+  const handleBalloonClick = (balloon: Balloon) => {
+    if (gameState !== 'playing' || !correctWord) return;
 
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      oscillator.frequency.value = 800; // 주파수
-      oscillator.type = 'sine';
-
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.1);
-    } catch (e) {
-      console.log('Audio playback failed:', e);
-    }
-  };
-
-  // 단어 선택/해제
-  const handleWordClick = (word: Word) => {
-    if (gameState !== 'finding' || !question) return;
-
-    // 터치 소리 재생
-    playTapSound();
-
-    const isSelected = question.selectedWords.find(w => w.word === word.word);
-
-    if (isSelected) {
-      // 선택 해제
-      setQuestion({
-        ...question,
-        selectedWords: question.selectedWords.filter(w => w.word !== word.word)
-      });
-    } else {
-      // 선택
-      setQuestion({
-        ...question,
-        selectedWords: [...question.selectedWords, word]
-      });
-    }
-  };
-
-  // 정답 확인
-  const checkAnswer = () => {
-    if (!question) return;
-
-    const correctWordSet = new Set(question.correctWords.map(w => w.word));
-    const selectedWordSet = new Set(question.selectedWords.map(w => w.word));
-
-    // 개수가 다르면 오답
-    if (question.selectedWords.length !== question.correctWords.length) {
-      setGameState('failed');
-      return;
-    }
-
-    // 모든 정답 단어가 선택되었는지 확인
-    for (let word of correctWordSet) {
-      if (!selectedWordSet.has(word)) {
-        setGameState('failed');
-        return;
+    if (balloon.word.word === correctWord.word) {
+      // 정답!
+      setGameState('success');
+      setStreak(streak + 1);
+      if (cheerSoundRef.current) {
+        cheerSoundRef.current.play().catch(e => console.log('Cheer sound failed:', e));
       }
+    } else {
+      // 오답
+      setGameState('failed');
+      setStreak(0);
     }
+  };
 
-    // 정답!
-    setGameState('success');
+  // 다음 문제
+  const handleNextQuestion = () => {
+    const word = createQuestion();
+    setGameState('listening');
+    setTimeout(() => {
+      speak(word);
+    }, 500);
+  };
 
-    // 환호 사운드 재생
-    if (cheerSoundRef.current) {
-      cheerSoundRef.current.play().catch(e => console.log('Cheer sound play failed:', e));
+  // 다시하기 (같은 문제)
+  const handleRetry = () => {
+    setGameState('listening');
+    if (correctWord) {
+      setTimeout(() => {
+        speak(correctWord);
+      }, 500);
     }
   };
 
   // 다시 듣기
   const handleRelisten = () => {
-    if (remainingListens > 0 && question) {
-      setRemainingListens(remainingListens - 1);
-      setGameState('listening');
-      speak(question.correctWords);
+    if (correctWord) {
+      speak(correctWord);
     }
-  };
-
-  // 다음 레벨
-  const handleNextLevel = () => {
-    const nextLevel = currentLevel + 1;
-    setCurrentLevel(nextLevel);
-    const newQuestion = createQuestion(nextLevel);
-    setQuestion(newQuestion);
-    setRemainingListens(3);
-    setGameState('listening');
-    setTimeout(() => {
-      speak(newQuestion.correctWords);
-    }, 500);
-  };
-
-  // 다시하기
-  const handleRetry = () => {
-    if (question) {
-      setQuestion({
-        ...question,
-        selectedWords: []
-      });
-      setGameState('finding');
-    }
-  };
-
-  // 모르겠습니다 - 힌트 보기
-  const handleShowHint = () => {
-    if (!question) return;
-
-    // 토스트 메시지 표시
-    setShowToast(true);
-
-    // 음성 다시 재생
-    speak(question.correctWords);
-
-    // 2초 후 토스트 숨김
-    setTimeout(() => {
-      setShowToast(false);
-    }, 3000);
   };
 
   // 오디오 초기화
   useEffect(() => {
+    bgmRef.current = new Audio(getAssetPath('/sounds/bgm.mp3'));
+    bgmRef.current.loop = true;
+    bgmRef.current.volume = 0.3;
+
     cheerSoundRef.current = new Audio(getAssetPath('/sounds/cheer.mp3'));
+    cheerSoundRef.current.volume = 0.5;
 
     return () => {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
+      if (bgmRef.current) {
+        bgmRef.current.pause();
+      }
     };
   }, []);
+
+  // BGM 재생/정지
+  useEffect(() => {
+    if (bgmRef.current) {
+      if (gameState === 'playing' && !isMuted) {
+        bgmRef.current.play().catch((e) => console.log('BGM play failed:', e));
+      } else {
+        bgmRef.current.pause();
+      }
+    }
+  }, [gameState, isMuted]);
+
+  // 풍선이 화면 끝까지 올라가면 실패
+  useEffect(() => {
+    if (gameState === 'playing' && balloons.length > 0) {
+      const maxDuration = Math.max(...balloons.map(b => b.duration + b.delay));
+      const timer = setTimeout(() => {
+        setGameState('failed');
+        setStreak(0);
+      }, maxDuration);
+
+      return () => clearTimeout(timer);
+    }
+  }, [gameState, balloons]);
 
   // 플레이어 선택 화면
   if (gameState === 'selectPlayer') {
@@ -463,7 +367,7 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
         <div className="flex flex-col items-center py-8 md:py-16 px-4 md:px-8">
           <div className="text-center space-y-4 md:space-y-8 mb-8 md:mb-16">
             <h1 className="dongle-font text-6xl md:text-9xl font-bold text-white drop-shadow-2xl animate-bounce">
-              영어 듣기 게임 🎧
+              풍선 영어 게임 🎈
             </h1>
             <p className="text-3xl md:text-5xl text-white font-bold drop-shadow-lg">
               누가 할까요?
@@ -517,30 +421,20 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
             <p className="text-2xl md:text-4xl text-white drop-shadow-lg">
               잘 듣고 기억하세요!
             </p>
-            <div className="flex gap-2 md:gap-4 justify-center mt-4 md:mt-8">
-              {[...Array(3)].map((_, i) => (
-                <div
-                  key={i}
-                  className={`text-4xl md:text-6xl ${i < remainingListens ? 'opacity-100' : 'opacity-30'}`}
-                >
-                  ❤️
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  // 찾기/확인/성공/실패 단계
-  if (question && (gameState === 'finding' || gameState === 'checking' || gameState === 'success' || gameState === 'failed')) {
-    return (
-      <div className="w-full min-h-screen overflow-y-auto bg-gradient-to-br from-green-200 via-blue-200 to-purple-200 p-2 md:p-4">
-        {/* 상단바 */}
-        <div className="bg-white rounded-2xl shadow-lg p-2 md:p-4 mb-2 md:mb-4 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 md:gap-4">
-            {selectedPlayer && (
+  // 게임 플레이 화면
+  return (
+    <div className="w-full min-h-screen overflow-hidden bg-gradient-to-br from-sky-200 via-blue-200 to-indigo-200 relative">
+      {/* 상단바 */}
+      <div className="bg-white rounded-2xl shadow-lg p-2 md:p-4 m-2 md:m-4 flex flex-wrap items-center justify-between gap-2 relative z-10">
+        <div className="flex items-center gap-2 md:gap-4">
+          {selectedPlayer && (
+            <>
               <Image
                 src={selectedPlayer.image}
                 alt={selectedPlayer.name}
@@ -548,166 +442,147 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
                 height={40}
                 className="rounded-full object-cover md:w-[50px] md:h-[50px]"
               />
-            )}
-            <span className="text-lg md:text-2xl font-bold text-black">{selectedPlayer?.name}</span>
-          </div>
-          <div className="text-lg md:text-2xl font-bold text-black">Level {currentLevel}</div>
+              <span className="text-lg md:text-2xl font-bold text-black">{selectedPlayer.name}</span>
+            </>
+          )}
+        </div>
 
-          {/* 속도 조절 버튼 */}
-          <div className="flex gap-1 md:gap-2 items-center">
-            <button
-              onClick={() => setSpeechRate(0.3)}
-              className={`px-2 md:px-4 py-1 md:py-2 rounded-lg text-xs md:text-lg font-bold transition-all ${
-                speechRate === 0.3
-                  ? 'bg-purple-500 text-white shadow-lg'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              느리게
-            </button>
-            <button
-              onClick={() => setSpeechRate(0.5)}
-              className={`px-2 md:px-4 py-1 md:py-2 rounded-lg text-xs md:text-lg font-bold transition-all ${
-                speechRate === 0.5
-                  ? 'bg-purple-500 text-white shadow-lg'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              정상
-            </button>
-            <button
-              onClick={() => setSpeechRate(0.7)}
-              className={`px-2 md:px-4 py-1 md:py-2 rounded-lg text-xs md:text-lg font-bold transition-all ${
-                speechRate === 0.7
-                  ? 'bg-purple-500 text-white shadow-lg'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              빠르게
-            </button>
-          </div>
+        <div className="text-lg md:text-2xl font-bold text-blue-700">
+          연속 {streak}개 맞춤! 🔥
+        </div>
 
+        {/* 속도 조절 버튼 */}
+        <div className="flex gap-1 md:gap-2 items-center">
           <button
-            onClick={handleRelisten}
-            disabled={remainingListens === 0 || isAudioPlaying}
-            className={`px-3 md:px-6 py-2 md:py-3 rounded-xl text-sm md:text-xl font-bold ${
-              remainingListens > 0 && !isAudioPlaying
-                ? 'bg-blue-500 text-white hover:bg-blue-600'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            onClick={() => setSpeechRate(0.3)}
+            className={`px-2 md:px-4 py-1 md:py-2 rounded-lg text-xs md:text-lg font-bold transition-all ${
+              speechRate === 0.3
+                ? 'bg-purple-500 text-white shadow-lg'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
-            🔊 다시듣기
+            느리게
           </button>
-          <div className="flex gap-1 md:gap-2">
-            {[...Array(3)].map((_, i) => (
-              <span key={i} className={`text-2xl md:text-3xl ${i < remainingListens ? 'opacity-100' : 'opacity-30'}`}>
-                ❤️
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* 그림 그리드 */}
-        <div className={`grid ${question.options.length <= 8 ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-3 md:grid-cols-6'} gap-2 md:gap-6 mb-2 md:mb-4`}>
-          {question.options.map((word, idx) => {
-            const isSelected = question.selectedWords.find(w => w.word === word.word);
-            const isCorrect = gameState === 'success' && question.correctWords.find(w => w.word === word.word);
-            const isWrong = gameState === 'failed' && isSelected && !question.correctWords.find(w => w.word === word.word);
-
-            return (
-              <button
-                key={idx}
-                onClick={() => handleWordClick(word)}
-                disabled={gameState === 'success' || gameState === 'failed'}
-                className={`
-                  aspect-square rounded-2xl flex flex-col items-center justify-center
-                  transition-all transform hover:scale-105
-                  ${isSelected ? 'bg-green-300 border-2 md:border-4 border-green-600 scale-110 shadow-xl' : 'bg-white border-2 md:border-4 border-gray-300'}
-                  ${isCorrect ? 'bg-green-400 border-green-700 animate-bounce' : ''}
-                  ${isWrong ? 'bg-red-400 border-red-700' : ''}
-                `}
-              >
-                <div className="text-4xl md:text-8xl">{word.emoji}</div>
-                <div className="text-xs md:text-2xl font-bold text-gray-700 mt-1 md:mt-2">{word.koreanName}</div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* 하단 버튼 */}
-        <div className="flex flex-wrap gap-2 md:gap-4 justify-center pb-4">
-          {gameState === 'finding' && (
-            <>
-              <button
-                onClick={checkAnswer}
-                disabled={question.selectedWords.length !== question.correctWords.length}
-                className={`px-6 md:px-12 py-3 md:py-6 rounded-2xl text-xl md:text-3xl font-bold ${
-                  question.selectedWords.length === question.correctWords.length
-                    ? 'bg-green-500 text-white hover:bg-green-600'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                확인하기
-              </button>
-
-              <button
-                onClick={handleShowHint}
-                className="px-6 md:px-12 py-3 md:py-6 bg-yellow-500 text-white text-xl md:text-3xl font-bold rounded-2xl hover:bg-yellow-600"
-              >
-                힌트
-              </button>
-            </>
-          )}
-
-          {gameState === 'success' && (
-            <>
-              <div className="text-4xl md:text-6xl animate-bounce">🎉</div>
-              <button
-                onClick={handleNextLevel}
-                className="px-6 md:px-12 py-3 md:py-6 bg-gradient-to-r from-green-400 to-blue-500 text-white text-xl md:text-3xl font-bold rounded-2xl shadow-xl hover:shadow-2xl"
-              >
-                다음 레벨 →
-              </button>
-            </>
-          )}
-
-          {gameState === 'failed' && (
-            <>
-              <div className="text-4xl md:text-6xl">😢</div>
-              <button
-                onClick={handleRetry}
-                className="px-6 md:px-12 py-3 md:py-6 bg-orange-500 text-white text-xl md:text-3xl font-bold rounded-2xl hover:bg-orange-600"
-              >
-                다시하기
-              </button>
-            </>
-          )}
-
           <button
-            onClick={onBack}
-            className="px-4 md:px-8 py-3 md:py-6 bg-gray-600 text-white text-lg md:text-2xl font-bold rounded-2xl hover:bg-gray-700"
+            onClick={() => setSpeechRate(0.5)}
+            className={`px-2 md:px-4 py-1 md:py-2 rounded-lg text-xs md:text-lg font-bold transition-all ${
+              speechRate === 0.5
+                ? 'bg-purple-500 text-white shadow-lg'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
           >
-            그만하기
+            정상
+          </button>
+          <button
+            onClick={() => setSpeechRate(0.7)}
+            className={`px-2 md:px-4 py-1 md:py-2 rounded-lg text-xs md:text-lg font-bold transition-all ${
+              speechRate === 0.7
+                ? 'bg-purple-500 text-white shadow-lg'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            빠르게
           </button>
         </div>
 
-        {/* 토스트 메시지 - 정답 힌트 */}
-        {showToast && question && (
-          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-80 text-white px-6 md:px-12 py-4 md:py-8 rounded-3xl shadow-2xl z-50 animate-pulse max-w-[90vw]">
-            <div className="text-2xl md:text-4xl font-bold mb-2 md:mb-4 text-center">정답은:</div>
-            <div className="flex gap-2 md:gap-4 justify-center items-center flex-wrap">
-              {question.correctWords.map((word, idx) => (
-                <div key={idx} className="text-center">
-                  <div className="text-5xl md:text-7xl mb-1 md:mb-2">{word.emoji}</div>
-                  <div className="text-xl md:text-3xl font-bold">{word.koreanName}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
+        <button
+          onClick={handleRelisten}
+          disabled={isAudioPlaying}
+          className={`px-3 md:px-6 py-2 md:py-3 rounded-xl text-sm md:text-xl font-bold ${
+            !isAudioPlaying
+              ? 'bg-blue-500 text-white hover:bg-blue-600'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          }`}
+        >
+          🔊 다시듣기
+        </button>
 
-  return null;
+        <button
+          onClick={() => setIsMuted(!isMuted)}
+          className="px-3 md:px-6 py-2 md:py-3 bg-purple-500 text-white text-sm md:text-xl font-bold rounded-xl hover:bg-purple-600"
+        >
+          {isMuted ? '🔇' : '🔊'}
+        </button>
+
+        <button
+          onClick={onBack}
+          className="px-4 md:px-8 py-2 md:py-3 bg-gray-600 text-white text-lg md:text-2xl font-bold rounded-xl hover:bg-gray-700"
+        >
+          그만하기
+        </button>
+      </div>
+
+      {/* 풍선들 */}
+      {balloons.map((balloon) => (
+        <button
+          key={balloon.id}
+          onClick={() => handleBalloonClick(balloon)}
+          disabled={gameState !== 'playing'}
+          className="balloon absolute cursor-pointer transform hover:scale-110 transition-transform"
+          style={{
+            left: `${balloon.left}%`,
+            animationDelay: `${balloon.delay}ms`,
+            animationDuration: `${balloon.duration}ms`,
+          }}
+        >
+          <div className="relative">
+            {/* 풍선 모양 */}
+            <div className="w-20 h-24 md:w-32 md:h-40 bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 rounded-full relative shadow-2xl">
+              {/* 이모지 */}
+              <div className="absolute inset-0 flex items-center justify-center text-4xl md:text-6xl">
+                {balloon.word.emoji}
+              </div>
+              {/* 한글 이름 */}
+              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white px-2 py-1 rounded-lg shadow-lg whitespace-nowrap">
+                <span className="text-xs md:text-lg font-bold text-gray-800">
+                  {balloon.word.koreanName}
+                </span>
+              </div>
+            </div>
+            {/* 풍선 줄 */}
+            <div className="absolute left-1/2 top-full w-0.5 h-8 md:h-12 bg-gray-400 transform -translate-x-1/2"></div>
+          </div>
+        </button>
+      ))}
+
+      {/* 성공 오버레이 */}
+      {gameState === 'success' && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-2xl text-center animate-celebrate">
+            <div className="text-6xl md:text-8xl mb-4">🎉</div>
+            <h2 className="text-4xl md:text-5xl font-bold text-green-600 mb-6">
+              정답입니다!
+            </h2>
+            <p className="text-2xl md:text-3xl text-gray-700 mb-6">
+              연속 {streak}개 맞춤!
+            </p>
+            <button
+              onClick={handleNextQuestion}
+              className="px-8 py-4 bg-gradient-to-r from-green-400 to-blue-500 text-white text-2xl md:text-3xl font-bold rounded-2xl hover:shadow-2xl transition-all"
+            >
+              다음 문제 →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 실패 오버레이 */}
+      {gameState === 'failed' && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-2xl text-center animate-shake">
+            <div className="text-6xl md:text-8xl mb-4">😅</div>
+            <h2 className="text-4xl md:text-5xl font-bold text-orange-600 mb-6">
+              아쉬워요!
+            </h2>
+            <button
+              onClick={handleRetry}
+              className="px-8 py-4 bg-orange-500 text-white text-2xl md:text-3xl font-bold rounded-2xl hover:bg-orange-600 transition-all"
+            >
+              다시 시도
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
