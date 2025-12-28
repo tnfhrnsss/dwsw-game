@@ -173,7 +173,7 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
   const [balloons, setBalloons] = useState<Balloon[]>([]);
   const [streak, setStreak] = useState(0); // 연속 정답 카운터
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  const [speechRate, setSpeechRate] = useState(0.5);
+  const [speechRate, setSpeechRate] = useState(0.7);
   const [isMuted, setIsMuted] = useState(false);
   const bgmRef = useRef<HTMLAudioElement | null>(null);
   const cheerSoundRef = useRef<HTMLAudioElement | null>(null);
@@ -454,16 +454,6 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
         {/* 속도 조절 버튼 */}
         <div className="flex gap-1 md:gap-2 items-center">
           <button
-            onClick={() => setSpeechRate(0.3)}
-            className={`px-2 md:px-4 py-1 md:py-2 rounded-lg text-xs md:text-lg font-bold transition-all ${
-              speechRate === 0.3
-                ? 'bg-purple-500 text-white shadow-lg'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            느리게
-          </button>
-          <button
             onClick={() => setSpeechRate(0.5)}
             className={`px-2 md:px-4 py-1 md:py-2 rounded-lg text-xs md:text-lg font-bold transition-all ${
               speechRate === 0.5
@@ -471,12 +461,22 @@ export default function EnglishListeningGame({ onBack }: EnglishListeningGamePro
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
-            정상
+            느리게
           </button>
           <button
             onClick={() => setSpeechRate(0.7)}
             className={`px-2 md:px-4 py-1 md:py-2 rounded-lg text-xs md:text-lg font-bold transition-all ${
               speechRate === 0.7
+                ? 'bg-purple-500 text-white shadow-lg'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            정상
+          </button>
+          <button
+            onClick={() => setSpeechRate(0.9)}
+            className={`px-2 md:px-4 py-1 md:py-2 rounded-lg text-xs md:text-lg font-bold transition-all ${
+              speechRate === 0.9
                 ? 'bg-purple-500 text-white shadow-lg'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
